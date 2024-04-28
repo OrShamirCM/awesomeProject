@@ -1,0 +1,94 @@
+project_name: awesomeProject
+
+release:
+  name_template: 'awesomeProject 1.0.0'
+
+builds:
+  - main: ./main.go
+    env:
+      - CGO_ENABLED=0
+    binary: orcx
+    id: orcx
+    goos:
+      - linux
+      - windows
+    goarch:
+      - amd64
+      - arm
+      - arm64
+    ignore:
+      - goos: darwin
+        goarch: 386
+      - goos: linux
+        goarm: 7
+      - goos: windows
+        goarm: 7
+      - goos: windows
+        goarch: arm
+      - goos: windows
+        goarch: arm64
+    ldflags:
+      - -s
+      - -w
+      - -X 1.0.0
+  - main: ./main.go
+    env:
+      - CGO_ENABLED=0
+    binary: cx
+    id: cx-mac-universal
+    goos:
+      - darwin
+    goarch:
+      - amd64
+      - arm
+      - arm64
+    ldflags:
+      - -s
+      - -w
+      - -X 1.0.0
+
+archives:
+  - id: cx
+    builds:
+      - cx
+    format_overrides:
+      - goos: windows
+        format: zip
+    replacements:
+      amd64: x64
+      386: x32
+    files:
+      - LICENSE
+  - id: cx-latest
+    builds:
+      - cx
+    format_overrides:
+      - goos: windows
+        format: zip
+    replacements:
+      amd64: x64
+      386: x32
+    files:
+      - LICENSE
+    name_template: 'orcx-mac_amd_64'
+  - id: cx-mac-universal
+    builds:
+      - cx-mac-universal
+    files:
+      - LICENSE
+      - ./dist/cx-mac-universal_darwin_all/cx.dmg
+    name_template: "orcx-mac_darwin_x64"
+  - id: cx-mac-universal-latest
+    builds:
+      - cx-mac-universal
+    files:
+      - LICENSE
+      - ./dist/cx-mac-universal_darwin_all/cx.dmg
+    name_template: "orcx-macdarwin_x64"
+
+universal_binaries:
+  - id: cx-mac-universal
+    replace: true
+    name_template: "cx"
+    hooks:
+      post: gon gonMac.hcl
